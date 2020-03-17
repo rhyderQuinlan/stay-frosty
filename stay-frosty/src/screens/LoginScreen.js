@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   inputcontainer: {
     flex: 3, 
     justifyContent: 'center',
-    width: '80%'
+    width: '100%'
   },
   errorcontainer: {
 

@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
-import { ListItem } from 'react-native-elements';
 import firebase from 'firebase';
+
+import ListItem from '../components/ListItem';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -28,17 +29,26 @@ class HomeScreen extends Component {
         const { currentUser } = firebase.auth()
         //get user role
         await firebase.database().ref(`/users/${currentUser.uid}/`).on('value', snapshot => {
-            this.setState({ user_role: snapshot.role })
+            this.setState({ user_role: snapshot.val().role })
         })
 
         //get user_list
         await firebase.database().ref(`/users/`).on('value', snapshot => {
             var user_list = []
-            snapshot.forEach((childSub) => {
-                user_list.push(childSub.val())
-            })
+            if(this.state.user_role == 'helper'){
+                snapshot.forEach((childSub) => {
+                    if(childSub.val().role == 'helpee'){
+                        user_list.push(childSub.val())
+                    }
+                })
+            } else {
+                snapshot.forEach((childSub) => {
+                    if(childSub.val().role == 'helper'){
+                        user_list.push(childSub.val())
+                    }
+                })
+            }
 
-            console.log(user_list)
             this.setState({user_list: user_list.reverse()})
         })
     }
@@ -49,41 +59,31 @@ class HomeScreen extends Component {
                 <View style={styles.contentContainer}>
                     {
                         this.state.user_role == 'helper' ? (
-                            <View>
-                                <Text>You are helping the world</Text>
-
-                                <ScrollView>
-                                    <FlatList
-                                        data={this.state.user_list}
-                                        renderItem={({item, index}) => 
-                                            <ListItem 
-                                                style={styles.item}
-                                                name={item.firstname + " " + item.lastname}
-                                            />}
-                                        keyExtractor={(item, index) => index.toString()}
-                                    />
-                                </ScrollView>
-                            </View>
-                            
+                                <View>
+                                    <Text>You are helping the world</Text>
+                                </View>
                             ) : (
                                 <View>
                                     <Text>Help is on the way</Text>
-
-                                    <ScrollView>
-                                        <FlatList
-                                            data={this.state.user_list}
-                                            renderItem={({item, index}) => 
-                                                <ListItem 
-                                                    style={styles.item}
-                                                    name={item.firstname + " " + item.lastname}
-                                                />}
-                                            keyExtractor={(item, index) => index.toString()}
-                                        />
-                                    </ScrollView>
                                 </View>
                                 
                                 )
                     }
+
+                    <View>
+                        <ScrollView>
+                            <FlatList
+                                data={this.state.user_list}
+                                renderItem={({item, index}) =>
+                                    //TODO clickable list item -> user profile
+                                    <ListItem 
+                                        style={styles.item}
+                                        name={item.firstname + " " + item.lastname}
+                                    />}
+                                keyExtractor={(item, index) => index.toString()}
+                            />
+                        </ScrollView>
+                    </View>
                 </View>     
             </View>
             

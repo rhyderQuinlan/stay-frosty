@@ -24,7 +24,7 @@ class EditUserDetails extends Component {
             email: '',
             firstname: '',
             lastname: '',
-            licence: '',
+            role: '',
             currentPassword: '',
             newPassword: '',
             showchangesdialog: false,
@@ -39,12 +39,12 @@ class EditUserDetails extends Component {
             this.email = snapshot.val().email
             this.firstname = snapshot.val().firstname
             this.lastname = snapshot.val().lastname
-            this.licence = snapshot.val().licence
+            this.role = snapshot.val().role
             this.setState({
                 email: this.email,
                 firstname: this.firstname,
                 lastname: this.lastname,
-                licence: this.licence,
+                role: this.role,
             })
         })
     }
@@ -54,14 +54,14 @@ class EditUserDetails extends Component {
         const {
             firstname,
             lastname,
-            licence,
+            role,
             currentPassword
         } = this.state
 
         var Data = {
             firstname: firstname,
             lastname: lastname,
-            licence: licence
+            role: role
         }
         
           var updates = {};
@@ -121,13 +121,20 @@ class EditUserDetails extends Component {
                         <DropdownInput 
                                 icon="drivers-license-o"
                                 type="font-awesome"
-                                label={this.licence}
+                                label={this.role}
                                 data={[{
-                                    value: 'Full Licence'
+                                    value: 'I want to help'
                                 }, {
-                                    value: 'Provisional Licence'
+                                    value: 'I need some help'
                                 }]}
-                                onChangeText={(value) => this.setState({ licence: value})}
+                                onChangeText={(value) => {
+                                    if(value == 'I want to help'){
+                                        this.setState({ licence: 'helpee'})
+                                    } else {
+                                        this.setState({ licence: 'helper'})
+                                    }
+                                }}
+                                
                             />
                     </View>
                     <View style={{width: 250, alignSelf: 'center'}}>
