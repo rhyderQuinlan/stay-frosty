@@ -14,6 +14,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import UserRegistration from './src/screens/Registration/UserRegistration';
 import EditUserDetails from './src/screens/User/EditUserDetails';
 import MoreScreen from './src/screens/MoreScreen';
+import UserProfile from './src/screens/UserProfile';
 
 console.disableYellowBox = true;
 
@@ -86,6 +87,10 @@ const MainNavigator = createStackNavigator(
           alignSelf: 'center'
         }
       }
+    },
+    UserProfile: {
+      screen: UserProfile,
+      
     },
     BottomTab: {
       screen: BottomTab,
