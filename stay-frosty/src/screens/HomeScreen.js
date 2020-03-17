@@ -7,9 +7,10 @@ import {
     View,
     Text,
     Dimensions,
+    AsyncStorage,
 } from 'react-native';
 
-import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { ScrollView, FlatList, TouchableHighlight } from 'react-native-gesture-handler';
 import firebase from 'firebase';
 
 import ListItem from '../components/ListItem';
@@ -21,7 +22,8 @@ class HomeScreen extends Component {
         super(props);
         this.state = {
             user_role: '',
-            user_list: []
+            user_list: [],
+            indexInfo: ""
         };
     }
 
@@ -76,11 +78,28 @@ class HomeScreen extends Component {
                                 data={this.state.user_list}
                                 renderItem={({item, index}) =>
                                     //TODO clickable list item -> user profile
+                                    
+                                    <TouchableHighlight onPress={() => {
+                                        this.setState({indexInfo: index})
+                                        console.log(index.toString())
+                                        try{
+                                            AsyncStorage.setItem('INDEX', this.state.indexInfo)
+                                        } catch (error) {
+                                            console.log("async rememberMe error: " + error)
+                                        }
+                                        this.props.navigation.navigate("UserProfile", {userIndex: this.state.indexInfo})
+                                    }}>
                                     <ListItem 
                                         style={styles.item}
                                         name={item.firstname + " " + item.lastname}
-                                    />}
-                                keyExtractor={(item, index) => index.toString()}
+                                    />
+                                    </TouchableHighlight>
+                                }
+                                keyExtractor={(item, index) =>{
+                                    index.toString()
+                                    // console.log(index.toString())
+                                } }
+                                
                             />
                         </ScrollView>
                     </View>
