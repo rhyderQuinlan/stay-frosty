@@ -7,6 +7,8 @@ import {
     View,
     Text,
     Dimensions,
+    Platform,
+    PermissionsAndroid
 } from 'react-native';
 
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
@@ -15,6 +17,8 @@ import firebase from 'firebase';
 import ListItem from '../components/ListItem';
 
 const screenWidth = Dimensions.get("window").width;
+
+Geocoder.init("AIzaSyB2HNV3JKzVtnQxwHabSekf2buAnC7-qRo")
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -26,6 +30,9 @@ class HomeScreen extends Component {
     }
 
     async componentDidMount(){
+        //get user location
+        await this.getLocation()
+
         const { currentUser } = firebase.auth()
         //get user role
         await firebase.database().ref(`/users/${currentUser.uid}/`).on('value', snapshot => {
@@ -38,7 +45,17 @@ class HomeScreen extends Component {
             if(this.state.user_role == 'helper'){
                 snapshot.forEach((childSub) => {
                     if(childSub.val().role == 'helpee'){
-                        user_list.push(childSub.val())
+                        id = childSub.key
+                        fullname = childSub.val().firstname + " " + childSub.val().lastname
+                        distance = await this.measureDistance(childSub.val().address)
+
+                        data = {
+                            id: id,
+                            fullname: fullname,
+                            distance: distance
+                        }
+
+                        user_list.push(data)
                     }
                 })
             } else {
@@ -51,6 +68,60 @@ class HomeScreen extends Component {
 
             this.setState({user_list: user_list.reverse()})
         })
+    }
+
+    getLocation = async () => {
+        const hasLocationPermission = await this.hasLocationPermission();
+    
+        if (!hasLocationPermission) return;
+    
+        this.setState({ loading: true }, () => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log(position)
+                this.setState({ 
+                        location: position, 
+                        loading: false,
+                    });
+            },
+            (error) => {
+              this.setState({ location: error, loading: false });
+              console.log(error);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
+          );
+        });
+    }
+
+    hasLocationPermission = async () => {
+        if (Platform.OS === 'ios' ||
+            (Platform.OS === 'android' && Platform.Version < 23)) {
+        return true;
+        }
+    
+        const hasPermission = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+    
+        if (hasPermission) return true;
+    
+        const status = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+    
+        if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
+    
+        if (status === PermissionsAndroid.RESULTS.DENIED) {
+            Toast.show('Location permission denied by user.', Toast.LONG);
+        } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+            Toast.show('Location permission revoked by user.', Toast.LONG);
+        }
+    
+        return false;
+    }
+
+    measureDistance = async (address) => {
+        Geocoder.
     }
 
     render() { 

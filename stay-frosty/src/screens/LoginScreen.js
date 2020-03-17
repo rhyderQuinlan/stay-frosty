@@ -102,7 +102,7 @@ class LoginScreen extends Component {
       } catch (error) {
        console.log("async forgetUser error: " + error)
       }
-  };
+  }
 
   onClickListener = (viewId) => {
     Alert.alert("Alert", "Button pressed "+viewId)
