@@ -37,14 +37,14 @@ class LoginScreen extends Component {
   async componentDidMount(){
     if (!firebase.apps.length) {
       firebase.initializeApp({
-          apiKey: "AIzaSyDKm0rXYcIzsl7sx3-e-GPsUFrco_Qhtqo",
-          authDomain: "pay-as-you-drive-2c4ca.firebaseapp.com",
-          databaseURL: "https://pay-as-you-drive-2c4ca.firebaseio.com",
-          projectId: "pay-as-you-drive-2c4ca",
-          storageBucket: "pay-as-you-drive-2c4ca.appspot.com",
-          messagingSenderId: "1015176964135",
-          appId: "1:1015176964135:web:d0b7c221fec9bb10ee0602",
-          measurementId: "G-E2XJQPSRZL"
+          apiKey: "AIzaSyBxy1ID_WbvpcG1kHZXo-uQskAQ60Ww7B8",
+          authDomain: "stay-frosty.firebaseapp.com",
+          databaseURL: "https://stay-frosty.firebaseio.com",
+          projectId: "stay-frosty",
+          storageBucket: "stay-frosty.appspot.com",
+          messagingSenderId: "930673111907",
+          appId: "1:930673111907:web:7b8798a261aa560c1fd956",
+          measurementId: "G-684RXPD3HR"
       });
     }
     
@@ -110,12 +110,7 @@ class LoginScreen extends Component {
 
   signinUser(){
     firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-        if(this.state.email == 'admin@payasyoudrive.com'){
-          this.props.navigation.navigate('AdminOptions')
-        } else {
-          this.props.navigation.navigate('BottomTab')
-        }
-        
+        this.props.navigation.navigate('BottomTab')        
     }).catch((error) => {
       this.setState({error:error.message})
     });

@@ -42,15 +42,13 @@ class UserRegistration extends Component {
       email: this.state.email,
       firstname: this.state.firstname,
       lastname: this.state.lastname,
-      licence: this.state.licence
     }
 
     this.valid = false
 
     if(data.email != '' 
     && data.firstname != '' 
-    && data.lastname != '' 
-    && data.licence != ''){
+    && data.lastname != ''){
 
         this.valid = true
 
@@ -79,7 +77,7 @@ class UserRegistration extends Component {
       await firebase.database().ref(`users/${currentUser.uid}/`).set(data)
     }
 
-    { this.valid ? this.props.navigation.navigate('VehicleRegistration') : Toast.show("Created user unsuccessfully")}
+    { this.valid ? this.props.navigation.navigate('HomeScreen') : Toast.show("Created user unsuccessfully")}
   }
 
   render() {
@@ -125,17 +123,6 @@ class UserRegistration extends Component {
                 onChangeText={(password) => this.setState({password})}
                 // ref={input => { this.passwordInput = input }}
                 secureTextEntry={true}
-            />
-          <DropdownInput 
-                icon="drivers-license-o"
-                type="font-awesome"
-                label="Licence"
-                data={[{
-                    value: 'Full Licence'
-                }, {
-                    value: 'Provisional Licence'
-                }]}
-                onChangeText={(value) => this.setState({ licence: value})}
             />
         </View>
         <View>
