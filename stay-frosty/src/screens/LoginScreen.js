@@ -110,8 +110,6 @@ class LoginScreen extends Component {
 
   signinUser(){
     firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-        // this.passwordInput.clear()
-        // this.emailInput.clear() TODO: commented until fixed
         if(this.state.email == 'admin@payasyoudrive.com'){
           this.props.navigation.navigate('AdminOptions')
         } else {
