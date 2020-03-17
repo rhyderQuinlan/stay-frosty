@@ -89,9 +89,9 @@ const MainNavigator = createStackNavigator(
     },
     BottomTab: {
       screen: BottomTab,
-      navigationOptions: {
-        headerShown: false
-      }
+      // navigationOptions: {
+      //   headerShown: false
+      // }
     }
   },
   {

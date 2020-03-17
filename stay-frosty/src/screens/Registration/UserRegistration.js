@@ -29,7 +29,8 @@ class UserRegistration extends Component {
       email: '',
       password: '',
       licence: '',
-      error: ''
+      error: '',
+      user_role: ''
     }
   }
 
@@ -37,36 +38,39 @@ class UserRegistration extends Component {
     
    }
 
-  async createUser(){
-    const data = await {
-      email: this.state.email,
-      firstname: this.state.firstname,
-      lastname: this.state.lastname,
+   async setRole(role){
+      await this.setState({ user_role: role})
+
+      const data = await {
+        email: this.state.email,
+        firstname: this.state.firstname,
+        lastname: this.state.lastname,
+        role: this.state.user_role
+      }
+  
+      if(data.email != '' 
+      && data.firstname != '' 
+      && data.lastname != ''){
+  
+        this.createUser(data)
+  
+      } else {
+        Toast.show("All fields are required")
+      }
+      
     }
 
-    this.valid = false
+  async createUser(data){
+    this.valid = true
 
-    if(data.email != '' 
-    && data.firstname != '' 
-    && data.lastname != ''){
-
-        this.valid = true
-
-    } else {
-      Toast.show("All fields are required")
-    }
-
-    if(this.valid){
-      this.valid = await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => { 
-        this.setState({error: error.message})
-        return false
-      });
-    }
+    this.valid = await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => { 
+      this.setState({error: error.message})
+      return false
+    })
 
     if (this.valid) {
       await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-        // this.passwordInput.clear()
-        // this.emailInput.clear() TODO: commented until fixed
+
       }).catch((error) => {
         this.setState({error:error.message})
       });
@@ -77,7 +81,7 @@ class UserRegistration extends Component {
       await firebase.database().ref(`users/${currentUser.uid}/`).set(data)
     }
 
-    { this.valid ? this.props.navigation.navigate('HomeScreen') : Toast.show("Created user unsuccessfully")}
+    { this.valid ? this.props.navigation.navigate('BottomTab') : Toast.show("Created user unsuccessfully")}
   }
 
   render() {
@@ -131,10 +135,16 @@ class UserRegistration extends Component {
 
         <View style={{flex: 1}}>
           <ButtonComponent 
-            text="Next"
-            onPress={() => this.createUser()}
-            icon="arrowright"
-            type="antdesign"
+                  text="I Need Help"
+                  onPress={() => this.setRole('helpee')}
+                  icon="arrowright"
+                  type="antdesign"
+              />
+          <ButtonComponent 
+              text="I Want To Help"
+              onPress={() => this.setRole('helper')}
+              icon="arrowright"
+              type="antdesign"
           />
           <TouchableHighlight style={styles.buttonContainer} onPress={() => this.props.navigation.navigate('LoginScreen')}>
               <Text>Already have an account? Sign in.</Text>

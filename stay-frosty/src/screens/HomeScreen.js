@@ -1,4 +1,5 @@
-//TODO analytics lines chart
+//TODO get user location
+//TODO sort database by distance
 
 import React, { Component } from 'react';
 import {
@@ -8,8 +9,9 @@ import {
     Dimensions,
 } from 'react-native';
 
-import Journey from '../components/Journey'
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { ListItem } from 'react-native-elements';
+import firebase from 'firebase';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -17,68 +19,72 @@ class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            
+            user_role: '',
+            user_list: []
         };
     }
 
     async componentDidMount(){
+        const { currentUser } = firebase.auth()
+        //get user role
+        await firebase.database().ref(`/users/${currentUser.uid}/`).on('value', snapshot => {
+            this.setState({ user_role: snapshot.role })
+        })
 
-    }
+        //get user_list
+        await firebase.database().ref(`/users/`).on('value', snapshot => {
+            var user_list = []
+            snapshot.forEach((childSub) => {
+                user_list.push(childSub.val())
+            })
 
-    renderJourney(distance, cost){
-        return <Journey distance={distance} cost={cost} />
-    }
-
-    humanizedMonth(month){
-        switch (month) {
-            case 0:
-                month = "Jan"
-                break;
-            case 1:
-                month = "Feb"
-                break;
-            case 2:
-                month = "Mar"
-                break;
-            case 3:
-                month = "Apr"
-                break;
-            case 4:
-                month = "May"
-                break;
-            case 5:
-                month = "Jun"
-                break;
-            case 6:
-                month = "Jul"
-                break;
-            case 7:
-                month = "Aug"
-                break;
-            case 8:
-                month = "Sep"
-                break;
-            case 9:
-                month = "Oct"
-                break;
-            case 10:
-                month = "Nov"
-                break;
-            case 11:
-                month = "Dec"
-                break;        
-            default:
-                break;
-        }
-        return month
+            console.log(user_list)
+            this.setState({user_list: user_list.reverse()})
+        })
     }
 
     render() { 
         return(
             <View style={styles.main}>
                 <View style={styles.contentContainer}>
-                    <Text>Homescreen</Text>
-                </View>       
+                    {
+                        this.state.user_role == 'helper' ? (
+                            <View>
+                                <Text>You are helping the world</Text>
+
+                                <ScrollView>
+                                    <FlatList
+                                        data={this.state.user_list}
+                                        renderItem={({item, index}) => 
+                                            <ListItem 
+                                                style={styles.item}
+                                                name={item.firstname + " " + item.lastname}
+                                            />}
+                                        keyExtractor={(item, index) => index.toString()}
+                                    />
+                                </ScrollView>
+                            </View>
+                            
+                            ) : (
+                                <View>
+                                    <Text>Help is on the way</Text>
+
+                                    <ScrollView>
+                                        <FlatList
+                                            data={this.state.user_list}
+                                            renderItem={({item, index}) => 
+                                                <ListItem 
+                                                    style={styles.item}
+                                                    name={item.firstname + " " + item.lastname}
+                                                />}
+                                            keyExtractor={(item, index) => index.toString()}
+                                        />
+                                    </ScrollView>
+                                </View>
+                                
+                                )
+                    }
+                </View>     
             </View>
             
         )
@@ -93,7 +99,7 @@ const styles = StyleSheet.create({
     contentContainer:{
         flex: 2,
         flexDirection: 'column'
-    }
+    },
 });
 
 export default HomeScreen;

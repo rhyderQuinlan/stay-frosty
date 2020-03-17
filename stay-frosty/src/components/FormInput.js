@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
         height:55,
         marginBottom:20,
         flexDirection: 'row',
-        alignItems:'center'
+        alignItems:'center',
+        width: '80%'
     },
     iconTextContainer:{
         marginLeft: 10,

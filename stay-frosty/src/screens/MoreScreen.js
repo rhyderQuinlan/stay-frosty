@@ -1,5 +1,3 @@
-//TODO make claim
-
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -42,22 +40,9 @@ class MoreScreen extends Component {
                 </View>
                 <View style={styles.buttonContainer} >
                     <ButtonComponent 
-                        text="Vehicles"
-                        onPress={() => this.props.navigation.navigate('ViewVehicles')}
-                        icon="car"
-                        type="antdesign"
-                    />
-
-                    <ButtonComponent 
                         text="Profile Details"
                         onPress={() => this.props.navigation.navigate('EditUserDetails')}
                         icon="user"
-                        type="antdesign"
-                    />
-                    <ButtonComponent 
-                        text="Make Claim"
-                        onPress={() => alert("Make Claim Pressed")}
-                        icon="copy1"
                         type="antdesign"
                     />
 
