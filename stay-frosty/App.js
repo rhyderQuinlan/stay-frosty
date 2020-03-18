@@ -15,6 +15,9 @@ import UserRegistration from './src/screens/Registration/UserRegistration';
 import EditUserDetails from './src/screens/User/EditUserDetails';
 import MoreScreen from './src/screens/MoreScreen';
 import UserProfile from './src/screens/UserProfile';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import NewHelper from './src/screens/Registration/NewHelper';
+import NewHelpee from './src/screens/Registration/NewHelper';
 
 console.disableYellowBox = true;
 
@@ -90,7 +93,15 @@ const MainNavigator = createStackNavigator(
     },
     UserProfile: {
       screen: UserProfile,
-      
+    },
+    WelcomeScreen: {
+      screen: WelcomeScreen
+    },
+    NewHelper: {
+      screen: NewHelper
+    },
+    NewHelpee: {
+      screen: NewHelpee
     },
     BottomTab: {
       screen: BottomTab,
@@ -100,7 +111,7 @@ const MainNavigator = createStackNavigator(
     }
   },
   {
-    initialRouteName: 'LoginScreen',
+    initialRouteName: 'WelcomeScreen',
   }
 )
 
