@@ -10,9 +10,13 @@ import {
     Platform,
     PermissionsAndroid
 } from 'react-native';
+import Geocoder from 'react-native-geocoding';
+import Toast from 'react-native-simple-toast';
+
 
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import firebase from 'firebase';
+const haversine = require('haversine')
 
 import ListItem from '../components/ListItem';
 
@@ -25,33 +29,44 @@ class HomeScreen extends Component {
         super(props);
         this.state = {
             user_role: '',
-            user_list: []
+            user_list: [],
+            location: null,
         };
     }
 
+    
+
     async componentDidMount(){
         //get user location
-        await this.getLocation()
+        this.getLocation()
 
         const { currentUser } = firebase.auth()
         //get user role
         await firebase.database().ref(`/users/${currentUser.uid}/`).on('value', snapshot => {
-            this.setState({ user_role: snapshot.val().role })
+            this.setState({ user_role: snapshot.val().role, user_name: snapshot.val().firstname})
         })
 
         //get user_list
-        await firebase.database().ref(`/users/`).on('value', snapshot => {
+        firebase.database().ref(`/users/`).on('value', snapshot => {
             var user_list = []
             if(this.state.user_role == 'helper'){
-                snapshot.forEach((childSub) => {
+                Toast.show('You are a helper')
+                snapshot.forEach(async (childSub) => {
                     if(childSub.val().role == 'helpee'){
-                        id = childSub.key
-                        fullname = childSub.val().firstname + " " + childSub.val().lastname
-                        distance = await this.measureDistance(childSub.val().address)
+                        Geocoder.from(childSub.val().address)
+                            .then((json) => {
+                                const position = {
+                                    latitude: json.results[0].geometry.location.lat,
+                                    longitude: json.results[0].geometry.location.lng
+                                }
 
-                        data = {
-                            id: id,
-                            fullname: fullname,
+                                distance = (haversine({latitude: this.state.location.coords.latitude, longitude: this.state.location.coords.longitude}, position, {unit: 'km'}) || 0).toFixed(1)
+                            })
+                            .catch(error => console.log(error))
+
+                        const data = {
+                            id: childSub.key,
+                            name: childSub.val().firstname,
                             distance: distance
                         }
 
@@ -61,13 +76,22 @@ class HomeScreen extends Component {
             } else {
                 snapshot.forEach((childSub) => {
                     if(childSub.val().role == 'helper'){
-                        user_list.push(childSub.val())
+                        this.id = childSub.key
+                        this.name = childSub.val().firstname
+                        const data = {
+                            id: this.id,
+                            fullname: this.fullname,
+                        }
+
+                        user_list.push(data)
                     }
                 })
             }
 
             this.setState({user_list: user_list.reverse()})
         })
+        
+        console.log(this.state)
     }
 
     getLocation = async () => {
@@ -78,10 +102,8 @@ class HomeScreen extends Component {
         this.setState({ loading: true }, () => {
           navigator.geolocation.getCurrentPosition(
             (position) => {
-                console.log(position)
                 this.setState({ 
-                        location: position, 
-                        loading: false,
+                        location: position,
                     });
             },
             (error) => {
@@ -120,14 +142,11 @@ class HomeScreen extends Component {
         return false;
     }
 
-    measureDistance = async (address) => {
-        Geocoder.
-    }
-
     render() { 
         return(
             <View style={styles.main}>
-                <View style={styles.contentContainer}>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.welcome}>Welcome {this.state.user_name}</Text>
                     {
                         this.state.user_role == 'helper' ? (
                                 <View>
@@ -140,22 +159,25 @@ class HomeScreen extends Component {
                                 
                                 )
                     }
+                </View> 
 
-                    <View>
+                <View style={styles.listContainer}>
                         <ScrollView>
-                            <FlatList
-                                data={this.state.user_list}
-                                renderItem={({item, index}) =>
-                                    //TODO clickable list item -> user profile
+                        <FlatList
+                            data={this.state.user_list}
+                            renderItem={({item, index}) =>
+                                //TODO clickable list item -> user profile
                                     <ListItem 
                                         style={styles.item}
-                                        name={item.firstname + " " + item.lastname}
-                                    />}
-                                keyExtractor={(item, index) => index.toString()}
-                            />
+                                        name={item.name}
+                                        distance={item.distance}
+                                    />
+                                }
+                            keyExtractor={(item, index) => index.toString()}
+                        />
                         </ScrollView>
-                    </View>
-                </View>     
+                        
+                    </View>    
             </View>
             
         )
@@ -164,12 +186,24 @@ class HomeScreen extends Component {
 
 const styles = StyleSheet.create({
     main: {
-        flex: 5,
-        flexDirection: 'column'
+        flex: 1,
+        flexDirection: 'column',
+        marginTop: '10%',
+        justifyContent: 'space-between'
     },
-    contentContainer:{
+    headerContainer:{
         flex: 2,
-        flexDirection: 'column'
+        borderBottomColor: '#fb5b5a',
+        borderBottomWidth: 1,
+    },
+    welcome:{
+        fontWeight:"bold",
+        fontSize:42,
+        color:"#fb5b5a",
+      },
+
+    listContainer: {
+        flex: 5
     },
 });
 

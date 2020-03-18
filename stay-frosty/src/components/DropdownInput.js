@@ -9,13 +9,7 @@ import { Dropdown } from 'react-native-material-dropdown';
 const DropdownInput = (props) => {
     const {icon, label, data, type, onChangeText} = props;
     return(
-        <View style={styles.inputContainer}>
-            <Icon 
-                name={icon}
-                type={type}
-                style={styles.icon}
-                color="#007FF3"
-            />
+        <View style={styles.container}>
             <Dropdown 
                 label={label}
                 data={data}
@@ -27,24 +21,19 @@ const DropdownInput = (props) => {
 }
 
 const styles = StyleSheet.create({
-    inputContainer: {
-        borderBottomColor: '#FFD559',
-        backgroundColor: '#FFFFFF',
-        borderBottomWidth: 2,
-        height:55,
+    container:{
+        width:"80%",
+        backgroundColor:"#465881",
+        borderRadius:25,
+        height:50,
         marginBottom:20,
-        flexDirection: 'row',
-        alignItems:'center',
-        paddingLeft: 10
-    },
-    icon:{
-        width:100,
-        height:100
-    },
+        justifyContent:"center",
+        padding:20
+      },
     dropdown:{
         height: 25,
         marginLeft: 10,
-        width: '80%',
+        width: '100%',
         flexDirection: 'column',
         justifyContent: 'center',
         paddingBottom: 10,

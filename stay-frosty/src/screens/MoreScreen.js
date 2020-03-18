@@ -5,6 +5,7 @@ import {
     Text,
     Image,
     AsyncStorage,
+    TouchableOpacity,
     Alert
 } from 'react-native';
 import firebase from 'firebase';
@@ -32,27 +33,12 @@ class MoreScreen extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <View style={styles.iconContainer}>
-                    <Image 
-                        source={require('../../assets/settings.png')}
-                        style={styles.icon}
-                    />
-                </View>
-                <View style={styles.buttonContainer} >
-                    <ButtonComponent 
-                        text="Profile Details"
-                        onPress={() => this.props.navigation.navigate('EditUserDetails')}
-                        icon="user"
-                        type="antdesign"
-                    />
-
-                    <ButtonComponent 
-                        text='Logout'
-                        icon='logout'
-                        type='antdesign'
-                        onPress={() => this.logout()}
-                    />
-                </View> 
+                <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('EditUserDetails')}>
+                    <Text style={styles.loginText}>Profile Details</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.loginBtn} onPress={() => this.logout()}>
+                    <Text style={styles.loginText}>Logout</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -60,25 +46,25 @@ class MoreScreen extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 5,
-        flexDirection: 'column'
-    },
-    icon:{
-        width: 100,
-        height: 100
-    },
-    iconContainer:{
-        flex: 2,
-        flexDirection: 'row',
+        flex: 1,
+        backgroundColor: '#003f5c',
         alignItems: 'center',
-        alignSelf: 'center'
-    },
-    buttonContainer:{
-        flex: 2,
-        flexDirection: 'column',
-        alignItems: 'center',
-        alignSelf: 'center'
-    }
+        justifyContent: 'center',
+      },
+      loginBtn:{
+        width:"80%",
+        backgroundColor:"#fb5b5a",
+        borderRadius:25,
+        height:50,
+        alignItems:"center",
+        justifyContent:"center",
+        marginTop:30,
+        marginBottom:20
+      },
+      loginText: {
+        color: 'white',
+        fontSize: 20
+      },
 });
 
 export default MoreScreen;

@@ -4,7 +4,8 @@ import {
     View,
     Text,
     TouchableOpacity,
-    Image
+    Image,
+    TextInput
 } from 'react-native';
 import firebase from 'firebase';
 import Select2 from 'react-native-select-two';
@@ -12,10 +13,6 @@ import { Icon } from 'react-native-elements';
 import { Dropdown } from 'react-native-material-dropdown';
 import Toast from 'react-native-simple-toast';
 import Dialog from "react-native-dialog";
-
-import ButtonComponent from '../../components/ButtonComponent';
-import FormInput from '../../components/FormInput';
-import DropdownInput from '../../components/DropdownInput';
 
 class EditUserDetails extends Component {
     constructor(props) {
@@ -93,180 +90,164 @@ class EditUserDetails extends Component {
     render(){
         return(
             <View style={styles.container}>
-                <View style={styles.content}>
-                    <View style={{ flex: 3, justifyContent: 'center' }}>
-                        <Image 
-                            source={require('../../../assets/face-scan.png')}
-                            style={styles.image}
-                        />
-                        <Text style={styles.headingtext}>{this.state.email}</Text>
-                        <FormInput
-                                icon="user"
-                                type="antdesign"
-                                placeholder={this.firstname}
-                                keyboardType="default"
-                                onChangeText={(firstname) => this.setState({firstname})}
-                                // ref={(input) => { this.firstnameInput = input }}
-                                secureTextEntry={false}
-                            />
-                        <FormInput
-                            icon="user"
-                            type="antdesign"
-                            placeholder={this.lastname}
-                            keyboardType="default"
-                            onChangeText={(lastname) => this.setState({lastname})}
-                            // ref={(input) => { this.lastnameInput = input }}
-                            secureTextEntry={false}
-                        />
-                        <DropdownInput 
-                                icon="drivers-license-o"
-                                type="font-awesome"
-                                label={this.role}
-                                data={[{
+                <Text style={styles.logo}>Edit Profile</Text>
+                <Text style={styles.headingtext}>{this.state.email}</Text>
+        
+                <View style={styles.inputView}>
+                    <TextInput  
+                        style={styles.inputText}
+                        placeholder={this.firstname}
+                        placeholderTextColor="#003f5c"
+                        onChangeText={firstname => this.setState({firstname})}/>
+                </View>
+
+                <View style={styles.inputView}>
+                    <TextInput  
+                        style={styles.inputText}
+                        placeholder={this.lastname}
+                        placeholderTextColor="#003f5c"
+                        onChangeText={lastname => this.setState({lastname})}/>
+                </View>
+
+                <View style={styles.inputView}>
+                    <Dropdown 
+                        label={`Change Role (Currently ${this.role})`}
+                        data={[{
                                     value: 'I want to help'
                                 }, {
                                     value: 'I need some help'
                                 }]}
-                                onChangeText={(value) => {
+                        containerStyle={styles.dropdown}
+                        onChangeText={(value) => {
                                     if(value == 'I want to help'){
                                         this.setState({ licence: 'helpee'})
                                     } else {
                                         this.setState({ licence: 'helper'})
                                     }
                                 }}
-                                
-                            />
-                    </View>
-                    <View style={{width: 250, alignSelf: 'center'}}>
-                        <Text style={{textAlign: 'center', color: 'red'}}>{this.state.error}</Text>
-                    </View>
-                    <View>
-                        <Dialog.Container visible={this.state.showchangesdialog}>
-                            <Dialog.Title>Enter password</Dialog.Title>
-                            <Dialog.Description>
-                                Enter password to make changes
-                            </Dialog.Description>
-                            <Dialog.Input 
-                                onChangeText={(currentPassword) => this.setState({currentPassword})} 
-                                secureTextEntry={true}
-                                label="Password"
-                                />
-                            <Dialog.Button label="Cancel" onPress={() => this.setState({ showchangesdialog: false})}/>
-                            <Dialog.Button label="Confirm" onPress={() => {
-                                this.setState({showchangesdialog: false})
-                                this.submitChanges()
-                                }}/>
-                        </Dialog.Container>
-                    </View>
+                    />
+                </View>
 
-                    <View>
-                        <Dialog.Container visible={this.state.changepassworddialog}>
-                            <Dialog.Title>Change Password</Dialog.Title>
-                            <Dialog.Description>
-                                Confirm current password & enter new password
-                            </Dialog.Description>
-                            <Dialog.Input 
-                                onChangeText={(currentPassword) => this.setState({currentPassword})} 
-                                secureTextEntry={true}
-                                label="Enter Current Password"
-                                placeholder="Current Password"
-                                />
-                            <Dialog.Input 
-                                onChangeText={(newPassword) => this.setState({newPassword})} 
-                                secureTextEntry={true}
-                                label="Enter New Password"
-                                placeholder="New Password"
-                                />
-                            <Dialog.Button label="Cancel" onPress={() => this.setState({ changepassworddialog: false})}/>
-                            <Dialog.Button label="Confirm" onPress={() => {
-                                if(this.state.currentPassword != '' && this.state.newPassword != ''){
-                                    this.setState({changepassworddialog: false})
-                                    this.changePassword(this.state.currentPassword, this.state.newPassword)
-                                } else {
-                                    Toast.show("All fields are required")
-                                }
-                                }}/>
-                        </Dialog.Container>
-                    </View>
+                <View style={{width: 250, alignSelf: 'center'}}>
+                    <Text style={{textAlign: 'center', color: 'red'}}>{this.state.error}</Text>
                 </View>
-                <View style={styles.button}>
-                    <ButtonComponent 
-                        text="Save Changes"
-                        icon="save"
-                        type="antdesign"
-                        onPress={() => this.setState({ showchangesdialog: true})}
-                    />
-                    <ButtonComponent 
-                        text="Change Password"
-                        icon="key"
-                        type="antdesign"
-                        onPress={() => this.setState({changepassworddialog: true})}
-                    />
-                    <TouchableOpacity 
-                        style={styles.cancel}
-                        onPress={() => this.props.navigation.goBack()}
-                    >
-                        <Text style={styles.canceltext}>Cancel</Text>
-                        <Icon 
-                            name="close"
-                            type="antdesign"
-                            style={{marginRight: 10}}
-                            color="#007FF3"
-                        />
-                    </TouchableOpacity>
+                <View>
+                    <Dialog.Container visible={this.state.showchangesdialog}>
+                        <Dialog.Title>Enter password</Dialog.Title>
+                        <Dialog.Description>
+                            Enter password to make changes
+                        </Dialog.Description>
+                        <Dialog.Input 
+                            onChangeText={(currentPassword) => this.setState({currentPassword})} 
+                            secureTextEntry={true}
+                            label="Password"
+                            />
+                        <Dialog.Button label="Cancel" onPress={() => this.setState({ showchangesdialog: false})}/>
+                        <Dialog.Button label="Confirm" onPress={() => {
+                            this.setState({showchangesdialog: false})
+                            this.submitChanges()
+                            }}/>
+                    </Dialog.Container>
                 </View>
+
+                <View>
+                    <Dialog.Container visible={this.state.changepassworddialog}>
+                        <Dialog.Title>Change Password</Dialog.Title>
+                        <Dialog.Description>
+                            Confirm current password & enter new password
+                        </Dialog.Description>
+                        <Dialog.Input 
+                            onChangeText={(currentPassword) => this.setState({currentPassword})} 
+                            secureTextEntry={true}
+                            label="Enter Current Password"
+                            placeholder="Current Password"
+                            />
+                        <Dialog.Input 
+                            onChangeText={(newPassword) => this.setState({newPassword})} 
+                            secureTextEntry={true}
+                            label="Enter New Password"
+                            placeholder="New Password"
+                            />
+                        <Dialog.Button label="Cancel" onPress={() => this.setState({ changepassworddialog: false})}/>
+                        <Dialog.Button label="Confirm" onPress={() => {
+                            if(this.state.currentPassword != '' && this.state.newPassword != ''){
+                                this.setState({changepassworddialog: false})
+                                this.changePassword(this.state.currentPassword, this.state.newPassword)
+                            } else {
+                                Toast.show("All fields are required")
+                            }
+                            }}/>
+                    </Dialog.Container>
+                </View>
+
+                <TouchableOpacity style={styles.loginBtn} onPress={() => this.setState({ showchangesdialog: true})}>
+                    <Text style={styles.loginText}>Save Changes</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.loginBtn} onPress={() => this.setState({changepassworddialog: true})}>
+                    <Text style={styles.loginText}>Change Password</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                    <Text style={styles.loginText}>Cancel</Text>
+                </TouchableOpacity>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    headingtext: {
-        fontSize: 24,
-        paddingTop: 20,
-        color: '#007FF3',
-        justifyContent: 'center',
-        textAlign: 'center',
-        paddingBottom: 30,
-        
-    },
-    content: {
-        flex: 4,
-        width: '80%'
-    }, 
-    button: {
-        flex: 2
-    },
     container: {
+        flex: 1,
+        backgroundColor: '#003f5c',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      inputView:{
+        width:"80%",
+        backgroundColor:"#465881",
+        borderRadius:25,
+        height:50,
+        marginBottom:20,
+        justifyContent:"center",
+        padding:20
+      },
+      logo:{
+        fontWeight:"bold",
+        fontSize:50,
+        color:"#fb5b5a",
+        marginBottom:10
+      },
+      inputText:{
+        height:50,
+        color:"white"
+      },
+      headingtext:{
+        color:"white",
+        fontSize:20,
+        marginBottom: 30
+      },
+      loginBtn:{
+        width:"80%",
+        backgroundColor:"#fb5b5a",
+        borderRadius:25,
+        height:50,
+        alignItems:"center",
+        justifyContent:"center",
+        marginTop:20,
+        marginBottom:10
+      },
+      loginText: {
+        color: 'white',
+        fontSize: 20
+      },
+      dropdown:{
+        height: 25,
+        width: '100%',
         flexDirection: 'column',
-        flex: 6,
-        alignItems: 'center',
-    },
-    cancel:{
-        alignSelf: 'center',
-        alignContent: 'center',
-        width: 250,
-        backgroundColor: 'white',
-        borderRadius: 400,
-        borderColor: '#007FF3',
-        borderWidth: 1,
-        padding: 15,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: '5%',
-    },
-    canceltext: {
-        fontSize: 20,
-        marginLeft: 20,
-        color: '#007FF3',
-        fontWeight: 'normal'
-    },
-    image:{
-        width: 100,
-        height: 100,
-        alignItems: 'center',
-        alignSelf: 'center'
-    }
+        justifyContent: 'center',
+        paddingBottom: 15,
+      },
 })
 
 export default EditUserDetails;

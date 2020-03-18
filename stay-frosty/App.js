@@ -16,7 +16,7 @@ import EditUserDetails from './src/screens/User/EditUserDetails';
 import MoreScreen from './src/screens/MoreScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import NewHelper from './src/screens/Registration/NewHelper';
-import NewHelpee from './src/screens/Registration/NewHelper';
+import NewHelpee from './src/screens/Registration/NewHelpee';
 
 console.disableYellowBox = true;
 
@@ -56,10 +56,10 @@ const BottomTab = createMaterialBottomTabNavigator(
   },
   {
     initialRouteName: 'Home',
-    activeColor: '#FFD559',
+    activeColor: '#fb5b5a',
     inactiveColor: '#EFF1F3',
     barStyle: { 
-      backgroundColor: '#007FF3',
+      backgroundColor: '#003f5c',
       elevation: 10
      },
   }
@@ -84,26 +84,32 @@ const MainNavigator = createStackNavigator(
     EditUserDetails: {
       screen: EditUserDetails,
       navigationOptions: {
-        title: 'View & Edit Details',
-        headerTitleStyle: {
-          alignSelf: 'center'
-        }
+        headerShown: false
       }
     },
     WelcomeScreen: {
-      screen: WelcomeScreen
+      screen: WelcomeScreen,
+      navigationOptions: {
+        headerShown: false
+      }
     },
     NewHelper: {
-      screen: NewHelper
+      screen: NewHelper,
+      navigationOptions: {
+        headerShown: false
+      }
     },
     NewHelpee: {
-      screen: NewHelpee
+      screen: NewHelpee,
+      navigationOptions: {
+        headerShown: false
+      }
     },
     BottomTab: {
       screen: BottomTab,
-      // navigationOptions: {
-      //   headerShown: false
-      // }
+      navigationOptions: {
+        headerShown: false
+      }
     }
   },
   {

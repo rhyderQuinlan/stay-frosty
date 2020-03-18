@@ -5,7 +5,7 @@ import {
   View,
   TextInput,
   Button,
-  TouchableHighlight,
+  TouchableOpacity,
   Image,
   Alert,
   Switch,
@@ -128,90 +128,73 @@ class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.imagecontainer}>
-          <Image 
-            source={require('../../assets/logo-yellow-blue.png')}
-            style={styles.image}
-          />
+        <Text style={styles.logo}>Welcome Back</Text>
+
+        <View style={styles.inputView}>
+          <TextInput  
+              style={styles.inputText}
+              placeholder="Email..." 
+              placeholderTextColor="#003f5c"
+              onChangeText={email => this.setState({email})}/>
         </View>
-        
-        <View style={styles.inputcontainer}>
-          <View>
-            <FormInput
-                icon="email-outline"
-                type="material-community"
-                placeholder="Email"
-                keyboardType='email-address'
-                onChangeText={(email) => this.setState({email})}
-                ref={(input) => { this.emailInput = input }}
-                secureTextEntry={false}
+        <View style={styles.inputView}>
+          <TextInput  
+              style={styles.inputText}
+              placeholder="Password..." 
+              placeholderTextColor="#003f5c"
+              onChangeText={password => this.setState({password})}
+              secureTextEntry={true}
               />
+        </View>
 
-            <FormInput
-                icon="account-key-outline"
-                type="material-community"
-                placeholder="Password"
-                keyboardType="default"
-                onChangeText={(password) => this.setState({password})}
-                ref={(input) => { this.passwordInput = input }}
-                secureTextEntry={true}
-              />
-          </View>
-
-          <View style={styles.errorcontainer}>
-            <Text style={styles.error}>{this.state.error}</Text>
-          </View>
-
-          <View style={styles.rememberMecontainer}>
+        <View style={styles.rememberMecontainer}>
               <View>
-                <Text>Remember Me</Text>
+                <Text style={styles.rememberme}>Remember Me</Text>
               </View>
               
               <View>
                 <Switch
                   value={this.state.rememberMe}
                   onValueChange={(value) => this.toggleRememberMe(value)}
-                  trackColor='#007FF3'
-                  thumbColor='#007FF3'
+                  trackColor='#fb5b5a'
+                  thumbColor='#fb5b5a'
                 />
               </View>
           </View>
 
-          <View>
-              <Dialog.Container visible={this.state.resetPasswordDialog}>
-                  <Dialog.Title>Reset password</Dialog.Title>
-                  <Dialog.Description>
-                      Enter account email address. Then check your emails for reset link.
-                  </Dialog.Description>
-                  <Dialog.Input 
-                      onChangeText={(passwordChangeEmail) => this.passwordChangeEmail = passwordChangeEmail}
-                      label="Email Address"
-                      placeholder="Enter email"
-                      />
-                  <Dialog.Button label="Cancel" onPress={() => this.setState({ resetPasswordDialog: false})}/>
-                  <Dialog.Button label="Confirm" onPress={() => {
-                      this.setState({resetPasswordDialog: false})
-                      this.resetPassword()
-                      }}/>
-              </Dialog.Container>
-          </View>
+        <TouchableOpacity style={styles.loginBtn} onPress={() => this.signinUser()}>
+          <Text style={styles.loginText}>LOGIN</Text>
+        </TouchableOpacity>
 
-          <View style={styles.linkcontainer}>
-            <ButtonComponent 
-              text="Login"
-              onPress={() => this.signinUser()}
-              icon="login"
-              type="antdesign"
-            />
+        <TouchableOpacity onPress={() => this.props.navigation.navigate('WelcomeScreen')}>
+          <Text style={styles.loginText}>Sign Up</Text>
+        </TouchableOpacity>
 
-            <TouchableHighlight style={styles.link} onPress={() => this.setState({resetPasswordDialog: true})}>
-                <Text>Forgot your password?</Text>
-            </TouchableHighlight>
+        <TouchableOpacity style={styles.buttonContainer} onPress={() => this.setState({resetPasswordDialog: true})}>
+            <Text style={styles.back}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-            <TouchableHighlight style={styles.link} onPress={() => this.props.navigation.navigate('UserRegistration')}>
-                <Text>Register</Text>
-            </TouchableHighlight>
-          </View>
+        <View style={styles.errorcontainer}>
+          <Text style={styles.error}>{this.state.error}</Text>
+        </View>
+
+        <View>
+            <Dialog.Container visible={this.state.resetPasswordDialog}>
+                <Dialog.Title>Reset password</Dialog.Title>
+                <Dialog.Description>
+                    Enter account email address. Then check your emails for reset link.
+                </Dialog.Description>
+                <Dialog.Input 
+                    onChangeText={(passwordChangeEmail) => this.passwordChangeEmail = passwordChangeEmail}
+                    label="Email Address"
+                    placeholder="Enter email"
+                    />
+                <Dialog.Button label="Cancel" onPress={() => this.setState({ resetPasswordDialog: false})}/>
+                <Dialog.Button label="Confirm" onPress={() => {
+                    this.setState({resetPasswordDialog: false})
+                    this.resetPassword()
+                    }}/>
+            </Dialog.Container>
         </View>
       </View>
     );
@@ -220,49 +203,57 @@ class LoginScreen extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 4,
+    flex: 1,
+    backgroundColor: '#003f5c',
     alignItems: 'center',
-  },
-  imagecontainer: {
-    flex: 1, 
-    justifyContent: 'flex-end'
-  },
-  image:{
-    width: 100,
-    height: 100,
-  },
-  inputcontainer: {
-    flex: 3, 
     justifyContent: 'center',
-    width: '100%'
   },
-  errorcontainer: {
-
+  inputView:{
+    width:"80%",
+    backgroundColor:"#465881",
+    borderRadius:25,
+    height:50,
+    marginBottom:20,
+    justifyContent:"center",
+    padding:20
   },
-  error: {
-    textAlign: 'center', 
-    color: 'red',
-    padding: 10
+  logo:{
+    fontWeight:"bold",
+    fontSize:50,
+    color:"#fb5b5a",
+    marginBottom:40
+  },
+  inputText:{
+    height:50,
+    color:"white"
+  },
+  back:{
+    color:"white",
+    fontSize:15,
+    marginTop: 20
+  },
+  loginBtn:{
+    width:"80%",
+    backgroundColor:"#fb5b5a",
+    borderRadius:25,
+    height:50,
+    alignItems:"center",
+    justifyContent:"center",
+    marginTop:30,
+    marginBottom:20
+  },
+  loginText: {
+    color: 'white',
+    fontSize: 20
   },
   rememberMecontainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
-    alignSelf: 'center',
-    justifyContent:  'space-between',
-    borderBottomColor: 'transparent',
-    paddingBottom: 20
   },
-  linkcontainer: {
-
-  },
-  link: {
-    height:45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    marginBottom:10,
-    borderRadius:5,
-    paddingTop: 10
+  rememberme: {
+    color: 'white',
+    fontSize: 15,
+    marginRight: 20,
+    textAlignVertical: 'bottom'
   }
 });
 

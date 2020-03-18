@@ -5,12 +5,13 @@ import {
   View,
   TextInput,
   Button,
-  TouchableHighlight,
+  TouchableOpacity,
   Image,
   Alert,
   Switch,
   AsyncStorage,
-  YellowBox
+  YellowBox,
+  ImageBackground
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import firebase from 'firebase';
@@ -48,16 +49,6 @@ class WelcomeScreen extends Component {
     this.setState({ 
       email: email || "", 
       rememberMe: email ? true : false });
-
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User logged in: " + user)
-      } else {
-        console.log("User logged out: " + user)
-        this.setState({rememberMe: false, email: '', password: ''})
-        this.forgetUser()
-      }
-    });
    }
 
   getRememberedUser = async () => {
@@ -82,36 +73,68 @@ class WelcomeScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <ButtonComponent 
-              text="I want to help"
-              onPress={() => this.props.navigation.navigate('NewHelper')}
-              icon="login"
-              type="antdesign"
-            />
+            <Text style={styles.logo}>Helping Hand</Text>
 
-        <ButtonComponent 
-              text="I need help"
-              onPress={() => this.props.navigation.navigate('NewHelpee')}
-              icon="login"
-              type="antdesign"
-            />
+            <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('NewHelper')}>
+              <Text style={styles.loginText}>I want to help</Text>
+            </TouchableOpacity>
 
-        <ButtonComponent 
-              text="Sign In"
-              onPress={() => this.props.navigation.navigate('LoginScreen')}
-              icon="login"
-              type="antdesign"
-            />
+            <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('NewHelpee')}>
+              <Text style={styles.loginText}>I need help</Text>
+            </TouchableOpacity>
 
-      </View>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('LoginScreen')}>
+              <Text style={styles.loginText}>Login</Text>
+            </TouchableOpacity>
+        </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-    container: {
-
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#003f5c',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputView:{
+    width:"80%",
+    backgroundColor:"#465881",
+    borderRadius:25,
+    height:50,
+    marginBottom:20,
+    justifyContent:"center",
+    padding:20
+  },
+  logo:{
+    fontWeight:"bold",
+    fontSize:50,
+    color:"#fb5b5a",
+    marginBottom:40
+  },
+  inputText:{
+    height:50,
+    color:"white"
+  },
+  back:{
+    color:"white",
+    fontSize:15
+  },
+  loginBtn:{
+    width:"80%",
+    backgroundColor:"#fb5b5a",
+    borderRadius:25,
+    height:50,
+    alignItems:"center",
+    justifyContent:"center",
+    marginTop:30,
+    marginBottom:30
+  },
+  loginText: {
+    color: 'white',
+    fontSize: 20,
+  }
 });
 
 export default WelcomeScreen;
