@@ -12,7 +12,9 @@ class UserProfile extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            index: this.props.navigation.getParam("id")
+            index: this.props.navigation.getParam("id"),
+            fullname: this.props.navigation.getParam("fullname"),
+            distance: this.props.navigation.getParam("distance")
         }
     }
 
@@ -20,6 +22,8 @@ class UserProfile extends Component {
         return(
             <View>
                 <Text>{this.state.index}</Text>
+                <Text>{this.state.fullname}</Text>
+                <Text>{this.state.distance}</Text>
             </View>
         )
     }
@@ -27,5 +31,11 @@ class UserProfile extends Component {
     
 }
 
+const styles = StyleSheet.create({
+    main: {
+       
+    }
+  
+});
 
 export default UserProfile
