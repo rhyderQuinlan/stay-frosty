@@ -14,7 +14,7 @@ import Geocoder from 'react-native-geocoding';
 import Toast from 'react-native-simple-toast';
 
 
-import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { ScrollView, FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import firebase, { database } from 'firebase';
 const haversine = require('haversine')
 
@@ -77,6 +77,7 @@ class HomeScreen extends Component {
                                     console.warn('Unable to geocode -------------------------------- ', error)
                                 })
                             temp_list.push({
+                                id: element.key,
                                 name: element.val().firstname,
                                 tags: element.val().tags,
                                 distance: distance
@@ -150,11 +151,16 @@ class HomeScreen extends Component {
 
     renderItem(item, index){
         return (
-            <ListItem 
-                style={styles.item}
-                name={item.name}
-                tags={item.tags}
-            />
+            <TouchableOpacity onPress={() => {
+                console.log(item.id)
+                this.props.navigation.navigate("UserProfile", item)
+            }}>
+                <ListItem 
+                    style={styles.item}
+                    name={item.name}
+                    tags={item.tags}
+                />
+            </TouchableOpacity>
         )
     }
 

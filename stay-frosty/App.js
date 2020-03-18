@@ -18,6 +18,7 @@ import WelcomeScreen from './src/screens/WelcomeScreen';
 import NewHelper from './src/screens/Registration/NewHelper';
 import NewHelpee_pg1 from './src/screens/Registration/NewHelpee_pg1';
 import NewHelpee_pg2 from './src/screens/Registration/NewHelpee_pg2';
+import UserProfile from './src/screens/UserProfile'
 
 console.disableYellowBox = true;
 
@@ -108,6 +109,12 @@ const MainNavigator = createStackNavigator(
     },
     NewHelpee_pg2: {
       screen: NewHelpee_pg2,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    UserProfile:{
+      screen: UserProfile,
       navigationOptions: {
         headerShown: false
       }
