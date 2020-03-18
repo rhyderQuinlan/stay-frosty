@@ -5,9 +5,10 @@ import {
     StyleSheet
  } from 'react-native';
  import { Icon } from 'react-native-elements';
+import { TextInput } from 'react-native-gesture-handler';
 
 const ListItem = (props) => {
-    const {name, distance} = props;
+    const {name, distance, tags} = props;
     return(
         <View style={styles.maincontainer}>
             <View style={styles.uppercontainer}>
@@ -28,11 +29,28 @@ const ListItem = (props) => {
                 </View>
             </View>
             <View style={styles.lowercontainer}>
+                <View style={styles.tagElement}>
+                    <Text style={styles.tagText}>{tags[0]}</Text>
+                </View>
                 
+                <View style={styles.tagElement}>
+                    <Text style={styles.tagText}>{tags[1]}</Text>
+                </View>
+
+                <View style={styles.tagElement}>
+                    <Text style={styles.tagText}>{tags[2]}</Text>
+                </View>
+                {
+                    tags.length > 3 ? (
+                        <Text>+ {tags.length - 3} more</Text>
+                    ) : null
+                }
             </View>
         </View>
     )
 };
+
+// {/* (tags.length > 3) ? (<Text>+ {tags.length - 3}</Text> ) : null */}
 
 const styles=StyleSheet.create({
     maincontainer: {
@@ -44,14 +62,14 @@ const styles=StyleSheet.create({
         paddingLeft: 40,
         paddingRight: 40,
         paddingBottom: 15,
-        paddingTop: 30
+        paddingTop: 30,
     },
     lowercontainer: {
-        flexDirection: 'row', 
-        justifyContent: 'space-around',
+        flexDirection: 'row',
         borderBottomColor: '#fb5b5a',
         borderBottomWidth: 1,
         paddingBottom: 15,
+        justifyContent: 'center'
     },
     leftContainer:{
 
@@ -63,7 +81,25 @@ const styles=StyleSheet.create({
     },
     name:{
         fontSize: 20
-    }
+    },
+    tagElement:{
+        borderRadius:25,
+        borderColor: '#fb5b5a',
+        borderWidth: 1,
+        backgroundColor: '#fb5b5a',
+        marginBottom:20,
+        justifyContent:"center",
+        paddingLeft: 15,
+        paddingRight: 15,
+        paddingTop: 5,
+        paddingBottom: 5,
+        marginRight: 10
+
+      },
+
+      tagText:{
+          color: 'white'
+      }
 });
 
 export default ListItem;

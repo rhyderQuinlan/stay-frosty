@@ -120,9 +120,9 @@ class EditUserDetails extends Component {
                         containerStyle={styles.dropdown}
                         onChangeText={(value) => {
                                     if(value == 'I want to help'){
-                                        this.setState({ licence: 'helpee'})
+                                        this.setState({ role: 'helpee'})
                                     } else {
-                                        this.setState({ licence: 'helper'})
+                                        this.setState({ role: 'helper'})
                                     }
                                 }}
                     />

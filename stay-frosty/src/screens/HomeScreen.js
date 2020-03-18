@@ -15,7 +15,7 @@ import Toast from 'react-native-simple-toast';
 
 
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
-import firebase from 'firebase';
+import firebase, { database } from 'firebase';
 const haversine = require('haversine')
 
 import ListItem from '../components/ListItem';
@@ -24,74 +24,77 @@ const screenWidth = Dimensions.get("window").width;
 
 Geocoder.init("AIzaSyB2HNV3JKzVtnQxwHabSekf2buAnC7-qRo")
 
+var user_list = []
+
 class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
             user_role: '',
-            user_list: [],
+            db: {},
+            user_info: {},
             location: null,
+            user_name: '',
+            loading: true
         };
     }
-
-    
 
     async componentDidMount(){
         //get user location
         this.getLocation()
 
         const { currentUser } = firebase.auth()
-        //get user role
-        await firebase.database().ref(`/users/${currentUser.uid}/`).on('value', snapshot => {
-            this.setState({ user_role: snapshot.val().role, user_name: snapshot.val().firstname})
-        })
+        try {
+            const ref = firebase.database().ref(`/users/${currentUser.uid}`)
+            const user_info = await ref.once('value')
+                .then(snapshot => {
+                    return snapshot.val()}
+                ) .catch( error => Toast.show(error))
+            
+            this.setState({user_info: user_info})
+        } catch (error) {
+            console.warn("Error fetching data ---------------------------- ", error)
+        }
 
-        //get user_list
-        firebase.database().ref(`/users/`).on('value', snapshot => {
-            var user_list = []
-            if(this.state.user_role == 'helper'){
-                Toast.show('You are a helper')
-                snapshot.forEach(async (childSub) => {
-                    if(childSub.val().role == 'helpee'){
-                        Geocoder.from(childSub.val().address)
-                            .then((json) => {
-                                const position = {
-                                    latitude: json.results[0].geometry.location.lat,
-                                    longitude: json.results[0].geometry.location.lng
-                                }
-
-                                distance = (haversine({latitude: this.state.location.coords.latitude, longitude: this.state.location.coords.longitude}, position, {unit: 'km'}) || 0).toFixed(1)
+        try {
+            const db_list = await firebase.database().ref(`/users/`).once('value')
+                .then(snapshot => {
+                    var temp_list = []
+                    var distance = 0
+                    snapshot.forEach((element) => {
+                        if(element.val().role != this.state.user_info.role){
+                            const distance = Geocoder.from(element.val().address)
+                                .then(json => {
+                                    return haversine(
+                                        this.state.location,
+                                        {
+                                            longitude: json.results.geometry.location.lng,
+                                            latitude: json.results.geometry.location.lat,
+                                        },
+                                        {unit: 'km'}
+                                    )
+                                }).catch(error => {
+                                    console.warn('Unable to geocode -------------------------------- ', error)
+                                })
+                            temp_list.push({
+                                name: element.val().firstname,
+                                tags: element.val().tags,
+                                distance: distance
                             })
-                            .catch(error => console.log(error))
-
-                        const data = {
-                            id: childSub.key,
-                            name: childSub.val().firstname,
-                            distance: distance
                         }
+                    })
 
-                        user_list.push(data)
-                    }
-                })
-            } else {
-                snapshot.forEach((childSub) => {
-                    if(childSub.val().role == 'helper'){
-                        this.id = childSub.key
-                        this.name = childSub.val().firstname
-                        const data = {
-                            id: this.id,
-                            fullname: this.fullname,
-                        }
+                    return temp_list
+            
+                }).catch(error => Toast.show(error))
 
-                        user_list.push(data)
-                    }
-                })
-            }
-
-            this.setState({user_list: user_list.reverse()})
-        })
+                console.log(db_list)
         
-        console.log(this.state)
+                this.setState({ db: db_list, loading: false})
+        } catch (error) {
+            console.warn("Error fetching data ---------------------------- ", error)
+        }
+        
     }
 
     getLocation = async () => {
@@ -103,7 +106,10 @@ class HomeScreen extends Component {
           navigator.geolocation.getCurrentPosition(
             (position) => {
                 this.setState({ 
-                        location: position,
+                        location: {
+                            longitude: position.coords.longitude,
+                            latitude: position.coords.latitude
+                        },
                     });
             },
             (error) => {
@@ -142,45 +148,55 @@ class HomeScreen extends Component {
         return false;
     }
 
-    render() { 
-        return(
-            <View style={styles.main}>
-                <View style={styles.headerContainer}>
-                    <Text style={styles.welcome}>Welcome {this.state.user_name}</Text>
-                    {
-                        this.state.user_role == 'helper' ? (
-                                <View>
-                                    <Text>You are helping the world</Text>
-                                </View>
-                            ) : (
-                                <View>
-                                    <Text>Help is on the way</Text>
-                                </View>
-                                
-                                )
-                    }
-                </View> 
+    renderItem(item, index){
+        return (
+            <ListItem 
+                style={styles.item}
+                name={item.name}
+                tags={item.tags}
+            />
+        )
+    }
 
-                <View style={styles.listContainer}>
+    render() { 
+        const { loading } = this.state
+        if(!loading){
+            console.log(this.state.db)
+            return(
+                <View style={styles.main}>
+                    <View style={styles.headerContainer}>
+                        <Text style={styles.welcome}>Welcome {this.state.user_info.firstname}</Text>
+                        {
+                            this.state.user_info.role == 'helper' ? (
+                                    <View>
+                                        <Text style={styles.subheading}>Here are some people that need your help</Text>
+                                    </View>
+                                ) : (
+                                    <View>
+                                        <Text style={styles.subheading}>Help is on the way</Text>
+                                    </View>
+                                    
+                                    )
+                        }
+                    </View> 
+    
+                    <View style={styles.listContainer}>
                         <ScrollView>
                         <FlatList
-                            data={this.state.user_list}
-                            renderItem={({item, index}) =>
+                            data={this.state.db}
+                            renderItem={({item, index}) => this.renderItem(item, index)}
                                 //TODO clickable list item -> user profile
-                                    <ListItem 
-                                        style={styles.item}
-                                        name={item.name}
-                                        distance={item.distance}
-                                    />
-                                }
                             keyExtractor={(item, index) => index.toString()}
                         />
                         </ScrollView>
-                        
                     </View>    
+                </View>
+            )          
+        } else {
+            return <View>
+                <Text> LOADING DATA</Text>
             </View>
-            
-        )
+        }
     }
 }
 
@@ -188,13 +204,16 @@ const styles = StyleSheet.create({
     main: {
         flex: 1,
         flexDirection: 'column',
-        marginTop: '10%',
         justifyContent: 'space-between'
     },
     headerContainer:{
         flex: 2,
-        borderBottomColor: '#fb5b5a',
-        borderBottomWidth: 1,
+        backgroundColor: '#003f5c',
+        justifyContent: 'flex-end',
+        paddingBottom: 30
+    },
+    subheading: {
+        color: 'white'
     },
     welcome:{
         fontWeight:"bold",

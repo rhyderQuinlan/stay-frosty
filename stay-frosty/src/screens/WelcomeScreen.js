@@ -44,11 +44,7 @@ class WelcomeScreen extends Component {
       });
     }
     
-    const email = await this.getRememberedUser();
-
-    this.setState({ 
-      email: email || "", 
-      rememberMe: email ? true : false });
+    await this.getRememberedUser();
    }
 
   getRememberedUser = async () => {
@@ -63,12 +59,13 @@ class WelcomeScreen extends Component {
         }).catch((error) => {
           this.setState({error:error.message})
         });
-        return email;
+      } else {
+        console.info('User not remembered')
       }
     } catch (error) {
         console.log("async getRememberedUser error: " + error)
     }
-  };
+}
 
   render() {
     return (
@@ -79,7 +76,7 @@ class WelcomeScreen extends Component {
               <Text style={styles.loginText}>I want to help</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('NewHelpee')}>
+            <TouchableOpacity style={styles.loginBtn} onPress={() => this.props.navigation.navigate('NewHelpee_pg1')}>
               <Text style={styles.loginText}>I need help</Text>
             </TouchableOpacity>
 

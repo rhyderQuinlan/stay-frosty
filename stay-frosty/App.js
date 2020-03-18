@@ -16,7 +16,8 @@ import EditUserDetails from './src/screens/User/EditUserDetails';
 import MoreScreen from './src/screens/MoreScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import NewHelper from './src/screens/Registration/NewHelper';
-import NewHelpee from './src/screens/Registration/NewHelpee';
+import NewHelpee_pg1 from './src/screens/Registration/NewHelpee_pg1';
+import NewHelpee_pg2 from './src/screens/Registration/NewHelpee_pg2';
 
 console.disableYellowBox = true;
 
@@ -99,8 +100,14 @@ const MainNavigator = createStackNavigator(
         headerShown: false
       }
     },
-    NewHelpee: {
-      screen: NewHelpee,
+    NewHelpee_pg1: {
+      screen: NewHelpee_pg1,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    NewHelpee_pg2: {
+      screen: NewHelpee_pg2,
       navigationOptions: {
         headerShown: false
       }

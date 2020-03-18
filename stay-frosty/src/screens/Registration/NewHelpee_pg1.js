@@ -22,7 +22,7 @@ import ButtonComponent from '../../components/ButtonComponent';
 import FormInput from '../../components/FormInput';
 import DropdownInput from '../../components/DropdownInput';
 
-class NewHelpee extends Component {
+class NewHelpee_pg1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -79,7 +79,7 @@ class NewHelpee extends Component {
       await firebase.database().ref(`users/${currentUser.uid}/`).set(data)
     }
 
-    { this.valid ? this.props.navigation.navigate('BottomTab') : Toast.show("Created user unsuccessfully")}
+    { this.valid ? this.props.navigation.navigate('NewHelpee_pg2') : null}
   }
 
   render() {
@@ -125,8 +125,12 @@ class NewHelpee extends Component {
               />
         </View>
 
+        <View style={{width: 250, alignSelf: 'center'}}>
+            <Text style={{textAlign: 'center', color: 'red'}}>{this.state.error}</Text>
+        </View>
+
             <TouchableOpacity style={styles.loginBtn} onPress={() => this.createUser()}>
-              <Text style={styles.loginText}>Let's Start</Text>
+              <Text style={styles.loginText}>Next</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.buttonContainer} onPress={() => this.props.navigation.navigate('LoginScreen')}>
@@ -183,4 +187,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default NewHelpee;
+export default NewHelpee_pg1;

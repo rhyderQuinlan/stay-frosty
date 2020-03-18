@@ -35,36 +35,8 @@ class LoginScreen extends Component {
   }
 
   async componentDidMount(){
-    if (!firebase.apps.length) {
-      firebase.initializeApp({
-          apiKey: "AIzaSyBxy1ID_WbvpcG1kHZXo-uQskAQ60Ww7B8",
-          authDomain: "stay-frosty.firebaseapp.com",
-          databaseURL: "https://stay-frosty.firebaseio.com",
-          projectId: "stay-frosty",
-          storageBucket: "stay-frosty.appspot.com",
-          messagingSenderId: "930673111907",
-          appId: "1:930673111907:web:7b8798a261aa560c1fd956",
-          measurementId: "G-684RXPD3HR"
-      });
-    }
-    
-    const email = await this.getRememberedUser();
 
-    this.setState({ 
-      email: email || "", 
-      rememberMe: email ? true : false });
-
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User logged in: " + user)
-      } else {
-        console.log("User logged out: " + user)
-        this.setState({rememberMe: false, email: '', password: ''})
-        this.forgetUser()
-      }
-    });
    }
-  
 
   rememberUser = async () => {
     try {
@@ -74,39 +46,12 @@ class LoginScreen extends Component {
       console.log("async rememberMe error: " + error)
     }
   };
-    
-  getRememberedUser = async () => {
-    try {
-      const email = await AsyncStorage.getItem('EMAIL');
-      const password = await AsyncStorage.getItem('PASSWORD')
-      if (email !== null) {
-        this.setState({ email: email, password: password })
-        this.signinUser();
-        return email;
-      }
-    } catch (error) {
-        console.log("async getRememberedUser error: " + error)
-    }
-  };
 
   resetPassword(){
     firebase.auth().sendPasswordResetEmail(this.passwordChangeEmail)
       .then(() => alert("Password reset email sent"))
       .catch((error) => this.setState({error:error.message}))
   }
-    
-  forgetUser = async () => {
-      try {
-        await AsyncStorage.removeItem('EMAIL');
-        await AsyncStorage.removeItem('PASSWORD')
-      } catch (error) {
-       console.log("async forgetUser error: " + error)
-      }
-  }
-
-  onClickListener = (viewId) => {
-    Alert.alert("Alert", "Button pressed "+viewId)
-  };
 
   signinUser(){
     firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {

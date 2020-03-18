@@ -25,11 +25,22 @@ class MoreScreen extends Component {
               },
               {text: 'Logout', onPress: () => {
                     firebase.auth().signOut()
-                    this.props.navigation.navigate('LoginScreen')}
+                    this.forgetUser()
+                    this.props.navigation.navigate('WelcomeScreen')}
                 },
             ],
           );
     }
+
+    forgetUser = async () => {
+        try {
+          await AsyncStorage.removeItem('EMAIL');
+          await AsyncStorage.removeItem('PASSWORD')
+        } catch (error) {
+         console.log("async forgetUser error: " + error)
+        }
+    }
+
     render() {
         return(
             <View style={styles.container}>
