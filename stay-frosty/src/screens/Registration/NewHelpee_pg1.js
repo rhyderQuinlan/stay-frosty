@@ -6,21 +6,16 @@ import {
   Text,
   View,
   TextInput,
-  Button,
+  Platform,
   TouchableOpacity,
-  Image,
-  Alert,
-  Switch,
-  AsyncStorage,
-  YellowBox
+  PermissionsAndroid
 } from 'react-native';
 import firebase from 'firebase';
 import _ from 'lodash';
 import Toast from 'react-native-simple-toast';
 
-import ButtonComponent from '../../components/ButtonComponent';
-import FormInput from '../../components/FormInput';
-import DropdownInput from '../../components/DropdownInput';
+import Geocoder from 'react-native-geocoding';
+Geocoder.init("AIzaSyB2HNV3JKzVtnQxwHabSekf2buAnC7-qRo")
 
 class NewHelpee_pg1 extends Component {
   constructor(props) {
@@ -32,31 +27,84 @@ class NewHelpee_pg1 extends Component {
       password: '',
       error: '',
       user_role: '',
-      address: ''
+      location: {}
     }
   }
 
   async componentDidMount(){
-    
-   }
+    this.getLocation()
+  }
+
+  getLocation = async () => {
+    const hasLocationPermission = await this.hasLocationPermission();
+
+    if (!hasLocationPermission) return;
+
+    this.setState({ loading: true }, () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+            this.setState({ 
+                    location: {
+                        longitude: position.coords.longitude,
+                        latitude: position.coords.latitude
+                    },
+                });
+                console.log("getPosition -> " + this.state.location.longitude)
+        },
+        (error) => {
+          this.setState({ location: error, loading: false });
+          console.log(error);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
+      );
+    });
+}
+
+hasLocationPermission = async () => {
+  if (Platform.OS === 'ios' ||
+      (Platform.OS === 'android' && Platform.Version < 23)) {
+  return true;
+  }
+
+  const hasPermission = await PermissionsAndroid.check(
+  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  );
+
+  if (hasPermission) return true;
+
+  const status = await PermissionsAndroid.request(
+  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  );
+
+  if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
+
+  if (status === PermissionsAndroid.RESULTS.DENIED) {
+      Toast.show('Location permission denied by user.', Toast.LONG);
+  } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      Toast.show('Location permission revoked by user.', Toast.LONG);
+  }
+
+  return false;
+}
 
   async createUser(){
     await this.setState({ user_role: 'helpee'})
+
+    console.log("State-location: " + this.state.location)
 
     const data = await {
         email: this.state.email,
         firstname: this.state.firstname,
         lastname: this.state.lastname,
         role: this.state.user_role,
-        address: this.state.address
+        location: this.state.location
     }
   
     this.valid = true
 
     if(data.email == '' 
     || data.firstname == '' 
-    || data.lastname == ''
-    || data.address){
+    || data.lastname == ''){
         Toast.show("All fields are required")
         this.valid = false
     }
@@ -100,13 +148,6 @@ class NewHelpee_pg1 extends Component {
               placeholder="Lastname..." 
               placeholderTextColor="#003f5c"
               onChangeText={lastname => this.setState({lastname})}/>
-        </View>
-        <View style={styles.inputView}>
-          <TextInput  
-              style={styles.inputText}
-              placeholder="Address..." 
-              placeholderTextColor="#003f5c"
-              onChangeText={address => this.setState({address})}/>
         </View>
         <View style={styles.inputView}>
           <TextInput  
@@ -161,7 +202,7 @@ const styles = StyleSheet.create({
     fontWeight:"bold",
     fontSize:50,
     color:"#fb5b5a",
-    marginBottom:40
+    marginBottom:40,
   },
   inputText:{
     height:50,

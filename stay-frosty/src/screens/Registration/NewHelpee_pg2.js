@@ -32,7 +32,7 @@ class NewHelpee_pg2 extends Component {
         user_role: '',
         address: '',
         selected: [],
-        tags: ['Food', 'Clothes', 'Support', 'Company', 'Dogs', 'Shopping']
+        tags: ['Food', 'Clothes', 'Support', 'Company', 'Pets', 'Shopping', 'Self-Isolated', 'Quarantined', 'Sick', 'Elderly', 'Money', 'Transport', 'Advice', 'Disability']
     }
   }
 
@@ -46,9 +46,9 @@ class NewHelpee_pg2 extends Component {
   addTags(){
         if(this.state.selected.length > 0){
             const { currentUser } = firebase.auth();
-            firebase.database().ref(`users/${currentUser.uid}/tags`).set(this.state.selected).then(()=>this.props.navigation.navigate('BottomTab'))
+            firebase.database().ref(`users/${currentUser.uid}/tags`).set(this.state.selected).then(()=>this.props.navigation.navigate('NewHelpee_pg3'))
             .catch(error => this.setState({error}))
-        } else {
+        } else {``
             this.setState({error: "Please select at least one"})
         }
   }
@@ -58,7 +58,7 @@ class NewHelpee_pg2 extends Component {
     
     return (
       <View style={styles.container}>
-        <Text style={styles.logo}>What do you need?</Text>
+        <Text style={styles.logo}>Give your profile some tags</Text>
         
         <TagsView
             all={tags}
@@ -72,7 +72,7 @@ class NewHelpee_pg2 extends Component {
         
 
         <TouchableOpacity style={styles.loginBtn} onPress={() => this.addTags()}>
-            <Text style={styles.loginText}>Let's Start</Text>
+            <Text style={styles.loginText}>Next</Text>
         </TouchableOpacity>
       </View>
     );

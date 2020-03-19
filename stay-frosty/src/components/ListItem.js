@@ -5,10 +5,20 @@ import {
     StyleSheet
  } from 'react-native';
  import { Icon } from 'react-native-elements';
-import { TextInput } from 'react-native-gesture-handler';
+import { TextInput, createNativeWrapper, FlatList } from 'react-native-gesture-handler';
 
 const ListItem = (props) => {
     const {name, distance, tags} = props;
+    var tags_array = []
+
+    for(index = 0; index < tags.length; index++){
+        if(index < 3){
+            tags_array.push(tags[index])
+        } else {
+            index = tags.length
+        }
+    }
+
     return(
         <View style={styles.maincontainer}>
             <View style={styles.uppercontainer}>
@@ -29,28 +39,29 @@ const ListItem = (props) => {
                 </View>
             </View>
             <View style={styles.lowercontainer}>
-                <View style={styles.tagElement}>
-                    <Text style={styles.tagText}>{tags[0]}</Text>
-                </View>
-                
-                <View style={styles.tagElement}>
-                    <Text style={styles.tagText}>{tags[1]}</Text>
-                </View>
+                    <FlatList
+                        data={tags_array}
+                        renderItem={({item, index}) =>
+                                <View style={styles.tagElement}>
+                                    <Text style={styles.tagText}>{item}</Text>
+                                </View>
+                        }
+                        keyExtractor={(item, index) => index.toString()}
+                        horizontal={true}
+                        style={{paddingLeft: 40}}
+                    />
 
-                <View style={styles.tagElement}>
-                    <Text style={styles.tagText}>{tags[2]}</Text>
-                </View>
-                {
-                    tags.length > 3 ? (
-                        <Text>+ {tags.length - 3} more</Text>
-                    ) : null
-                }
+                    {
+                        tags.length > 3 ? (
+                            <View style={{paddingRight: 30}}>
+                                <Text>+ {tags.length - 3} more</Text>
+                            </View>
+                        ) : null
+                    }
             </View>
         </View>
     )
-};
-
-// {/* (tags.length > 3) ? (<Text>+ {tags.length - 3}</Text> ) : null */}
+}
 
 const styles=StyleSheet.create({
     maincontainer: {
@@ -69,7 +80,6 @@ const styles=StyleSheet.create({
         borderBottomColor: '#fb5b5a',
         borderBottomWidth: 1,
         paddingBottom: 15,
-        justifyContent: 'center'
     },
     leftContainer:{
 

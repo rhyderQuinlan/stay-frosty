@@ -8,9 +8,6 @@ import {
     TextInput
 } from 'react-native';
 import firebase from 'firebase';
-import Select2 from 'react-native-select-two';
-import { Icon } from 'react-native-elements';
-import { Dropdown } from 'react-native-material-dropdown';
 import Toast from 'react-native-simple-toast';
 import Dialog from "react-native-dialog";
 
@@ -22,6 +19,7 @@ class EditUserDetails extends Component {
             firstname: '',
             lastname: '',
             role: '',
+            bio: '',
             currentPassword: '',
             newPassword: '',
             showchangesdialog: false,
@@ -37,11 +35,13 @@ class EditUserDetails extends Component {
             this.firstname = snapshot.val().firstname
             this.lastname = snapshot.val().lastname
             this.role = snapshot.val().role
+            this.bio = snapshot.val().bio
             this.setState({
                 email: this.email,
                 firstname: this.firstname,
                 lastname: this.lastname,
                 role: this.role,
+                bio: this.bio
             })
         })
     }
@@ -52,19 +52,18 @@ class EditUserDetails extends Component {
             firstname,
             lastname,
             role,
-            currentPassword
+            currentPassword,
+            bio
         } = this.state
 
         var Data = {
             firstname: firstname,
             lastname: lastname,
-            role: role
+            role: role,
+            bio: bio
         }
         
-          var updates = {};
-          updates[`/${currentUser.uid}/`] = Data;
-        
-          return firebase.database().ref().update(updates)
+          return firebase.database().ref(`/users/${currentUser.uid}/`).update(Data)
             .then(result => {
                 alert('Changes submitted succesfully...')
             })
@@ -97,7 +96,7 @@ class EditUserDetails extends Component {
                     <TextInput  
                         style={styles.inputText}
                         placeholder={this.firstname}
-                        placeholderTextColor="#003f5c"
+                        placeholderTextColor='white'
                         onChangeText={firstname => this.setState({firstname})}/>
                 </View>
 
@@ -105,27 +104,19 @@ class EditUserDetails extends Component {
                     <TextInput  
                         style={styles.inputText}
                         placeholder={this.lastname}
-                        placeholderTextColor="#003f5c"
+                        placeholderTextColor='white'
                         onChangeText={lastname => this.setState({lastname})}/>
                 </View>
 
-                <View style={styles.inputView}>
-                    <Dropdown 
-                        label={`Change Role (Currently ${this.role})`}
-                        data={[{
-                                    value: 'I want to help'
-                                }, {
-                                    value: 'I need some help'
-                                }]}
-                        containerStyle={styles.dropdown}
-                        onChangeText={(value) => {
-                                    if(value == 'I want to help'){
-                                        this.setState({ role: 'helpee'})
-                                    } else {
-                                        this.setState({ role: 'helper'})
-                                    }
-                                }}
-                    />
+                <View style={styles.inputBioView}>
+                    <TextInput  
+                        style={styles.inputBio}
+                        placeholder={this.lastname}
+                        placeholderTextColor='white'
+                        onChangeText={bio => this.setState({bio})}
+                        value={this.state.bio}
+                        multiline={true}
+                        />
                 </View>
 
                 <View style={{width: 250, alignSelf: 'center'}}>
@@ -212,6 +203,15 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         padding:20
       },
+      inputBioView:{
+        width:"80%",
+        height: '30%',
+        backgroundColor:"#465881",
+        borderRadius:25,
+        marginBottom:20,
+        justifyContent: 'flex-start',
+        padding:20,
+      },
       logo:{
         fontWeight:"bold",
         fontSize:50,
@@ -220,6 +220,9 @@ const styles = StyleSheet.create({
       },
       inputText:{
         height:50,
+        color:"white"
+      },
+      inputBio:{
         color:"white"
       },
       headingtext:{

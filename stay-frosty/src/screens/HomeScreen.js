@@ -10,9 +10,9 @@ import {
     Platform,
     PermissionsAndroid
 } from 'react-native';
-import Geocoder from 'react-native-geocoding';
 import Toast from 'react-native-simple-toast';
-
+import humanize from 'humanize-plus';
+import { Icon } from 'react-native-elements';
 
 import { ScrollView, FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import firebase, { database } from 'firebase';
@@ -22,7 +22,7 @@ import ListItem from '../components/ListItem';
 
 const screenWidth = Dimensions.get("window").width;
 
-Geocoder.init("AIzaSyB2HNV3JKzVtnQxwHabSekf2buAnC7-qRo")
+
 
 var user_list = []
 
@@ -35,7 +35,8 @@ class HomeScreen extends Component {
             user_info: {},
             location: null,
             user_name: '',
-            loading: true
+            loading: true,
+            count: 0
         };
     }
 
@@ -60,36 +61,36 @@ class HomeScreen extends Component {
             const db_list = await firebase.database().ref(`/users/`).once('value')
                 .then(snapshot => {
                     var temp_list = []
-                    var distance = 0
+                    var count = 0
                     snapshot.forEach((element) => {
                         if(element.val().role != this.state.user_info.role){
-                            const distance = Geocoder.from(element.val().address)
-                                .then(json => {
-                                    return haversine(
-                                        this.state.location,
-                                        {
-                                            longitude: json.results.geometry.location.lng,
-                                            latitude: json.results.geometry.location.lat,
-                                        },
-                                        {unit: 'km'}
-                                    )
-                                }).catch(error => {
-                                    console.warn('Unable to geocode -------------------------------- ', error)
+                            if(element.val().role == 'helper'){
+                                temp_list.push({
+                                    id: element.key,
+                                    name: element.val().firstname,
                                 })
-                            temp_list.push({
-                                id: element.key,
-                                name: element.val().firstname,
-                                tags: element.val().tags,
-                                distance: distance
-                            })
+                            } else {
+                                const distance = haversine(
+                                    this.state.location,
+                                    element.val().location,
+                                    {unit: 'km'}
+                                )
+                                
+                                temp_list.push({
+                                    id: element.key,
+                                    name: element.val().firstname,
+                                    tags: element.val().tags,
+                                    distance: distance,
+                                })
+                            }
+                            count++
                         }
+                        this.setState({count: count})
                     })
 
                     return temp_list
             
                 }).catch(error => Toast.show(error))
-
-                console.log(db_list)
         
                 this.setState({ db: db_list, loading: false})
         } catch (error) {
@@ -152,13 +153,13 @@ class HomeScreen extends Component {
     renderItem(item, index){
         return (
             <TouchableOpacity onPress={() => {
-                console.log(item.id)
                 this.props.navigation.navigate("UserProfile", item)
             }}>
                 <ListItem 
                     style={styles.item}
                     name={item.name}
                     tags={item.tags}
+                    distance={item.distance.toFixed(2)}
                 />
             </TouchableOpacity>
         )
@@ -167,41 +168,61 @@ class HomeScreen extends Component {
     render() { 
         const { loading } = this.state
         if(!loading){
-            console.log(this.state.db)
-            return(
-                <View style={styles.main}>
-                    <View style={styles.headerContainer}>
-                        <Text style={styles.welcome}>Welcome {this.state.user_info.firstname}</Text>
-                        {
-                            this.state.user_info.role == 'helper' ? (
-                                    <View>
-                                        <Text style={styles.subheading}>Here are some people that need your help</Text>
-                                    </View>
-                                ) : (
-                                    <View>
-                                        <Text style={styles.subheading}>Help is on the way</Text>
-                                    </View>
-                                    
-                                    )
-                        }
+            if(this.state.user_info.role == 'helper'){
+                //person looking to help screen
+                console.log(this.state.count)
+                return(
+                    <View style={styles.main}>
+                        <View style={styles.headerContainer}>
+                            <Text style={styles.welcome}>Welcome {this.state.user_info.firstname}</Text>
+                            <View>
+                                <Text style={styles.subheading}>Here are some people that need your help</Text>
+                            </View>
+                        </View> 
+        
+                        <View style={styles.listContainer}>
+                            <ScrollView>
+                                <FlatList
+                                    data={this.state.db}
+                                    renderItem={({item, index}) => this.renderItem(item, index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                />
+                            </ScrollView>
+                        </View>    
+                    </View>            
+            )} else {
+                //person in need of help
+                return (
+                    <View style={styles.main}>
+                            <View style={styles.headerContainer}>
+                                <Text style={styles.welcome}>Welcome {this.state.user_info.firstname}</Text>
+
+                                <View>
+                                    <Text style={styles.subheading}>Help is on the way</Text>
+                                </View>
+                            </View> 
+
+                            <View style={styles.contentContainer}>
+                                <View>
+                                    <Icon
+                                        name='group'
+                                        type='font-awesome'
+                                        color='#fb5b5a'
+                                        size={70}
+                                    />
+                                </View>
+                                <Text style={{fontSize: 20, paddingTop: 20}}>{this.state.count} {humanize.pluralize(this.state.count, "helper")} nearby</Text>
+                                <Text style={{fontSize: 20, paddingTop: 20}}>Helpers will contact you if they are up for lending a helping hand. Please be patient.</Text>
+                            </View>    
                     </View> 
-    
-                    <View style={styles.listContainer}>
-                        <ScrollView>
-                        <FlatList
-                            data={this.state.db}
-                            renderItem={({item, index}) => this.renderItem(item, index)}
-                                //TODO clickable list item -> user profile
-                            keyExtractor={(item, index) => index.toString()}
-                        />
-                        </ScrollView>
-                    </View>    
-                </View>
-            )          
+                )   
+            }        
         } else {
-            return <View>
-                <Text> LOADING DATA</Text>
-            </View>
+            return (
+                <View style={styles.loadingscreen}>
+                    <Text style={styles.loadingtext}> LOADING DATA</Text>
+                </View>
+            )
         }
     }
 }
@@ -219,17 +240,35 @@ const styles = StyleSheet.create({
         paddingBottom: 30
     },
     subheading: {
-        color: 'white'
+        color: 'white',
+        fontSize: 20
     },
     welcome:{
         fontWeight:"bold",
         fontSize:42,
         color:"#fb5b5a",
       },
-
     listContainer: {
-        flex: 5
+        flex: 5 
     },
+    loadingscreen: {
+        backgroundColor: '#003f5c',
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: 'center'
+    },
+    loadingtext:{
+        fontWeight:"bold",
+        fontSize:42,
+        color:"#fb5b5a",
+        textAlign: 'center'
+    },
+    contentContainer: {
+        alignItems: 'center',
+        flex: 5,
+        padding: '10%',
+        justifyContent: 'center'
+    }
 });
 
 export default HomeScreen;
