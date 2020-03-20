@@ -5,6 +5,6 @@ The idea is simple - a place where if you're in need of help you can ask for it.
 
 ## Where to start
 
-![Welcome Screen](./images/welcome-screen.jpg)
+![Welcome Screen](./images/welcome-screen.jpg | width=100)
 
 ## I'm in need of help
