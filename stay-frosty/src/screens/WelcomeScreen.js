@@ -18,10 +18,16 @@ import firebase from 'firebase';
 import Toast from 'react-native-simple-toast';
 import Dialog from "react-native-dialog";
 
-import ButtonComponent from '../components/ButtonComponent';
-
-import _ from 'lodash';
-import FormInput from '../components/FormInput';
+import { 
+  FIREBASE_APIKEY,
+  MESSENGERSENDER_ID,
+  APP_ID,
+  MEASUREMENT_ID,
+  DATABASE,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET
+} from 'react-native-dotenv'
 
 class WelcomeScreen extends Component {
   constructor(props) {
@@ -33,14 +39,14 @@ class WelcomeScreen extends Component {
   async componentDidMount(){
     if (!firebase.apps.length) {
       firebase.initializeApp({
-          apiKey: "AIzaSyBxy1ID_WbvpcG1kHZXo-uQskAQ60Ww7B8",
-          authDomain: "stay-frosty.firebaseapp.com",
-          databaseURL: "https://stay-frosty.firebaseio.com",
-          projectId: "stay-frosty",
-          storageBucket: "stay-frosty.appspot.com",
-          messagingSenderId: "930673111907",
-          appId: "1:930673111907:web:7b8798a261aa560c1fd956",
-          measurementId: "G-684RXPD3HR"
+          apiKey: FIREBASE_APIKEY,
+          authDomain: AUTH_DOMAIN,
+          databaseURL: DATABASE,
+          projectId: PROJECT_ID,
+          storageBucket: STORAGE_BUCKET,
+          messagingSenderId: MESSENGERSENDER_ID,
+          appId: APP_ID,
+          measurementId: MEASUREMENT_ID
       });
     }
     

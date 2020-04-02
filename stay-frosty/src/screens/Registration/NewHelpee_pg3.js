@@ -12,10 +12,11 @@ import {
 } from 'react-native';
 import firebase from 'firebase';
 import _ from 'lodash';
-import Toast from 'react-native-simple-toast';
+
+import {GEOCODER_KEY} from 'react-native-dotenv'
 
 import Geocoder from 'react-native-geocoding';
-Geocoder.init("AIzaSyB2HNV3JKzVtnQxwHabSekf2buAnC7-qRo")
+Geocoder.init(GEOCODER_KEY)
 
 class NewHelpee_pg3 extends Component {
   constructor(props) {
